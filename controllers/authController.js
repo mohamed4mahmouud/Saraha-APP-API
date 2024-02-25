@@ -36,7 +36,9 @@ export const signUp = asyncHandler(async (req, res, next) => {
   });
   const token = createToken(newUser._id);
 
-  let message = `<a href="http://localhost:8080/api/v1/user/confirmEmail/${token}">please click here to verfiy your email</a>`;
+  const message = `<a href="${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/user/confirmEmail/${token}">Please click here to verify your email</a>`;
   sendEmail(email, message);
   res.status(201).json({ message: "success", newUser });
 });
@@ -81,7 +83,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
     { confirmEmail: true },
     { new: true }
   );
-  res.json({ message: "updated", updatedUser });
+  res.status(200).json({ message: "updated", updatedUser });
 });
 
 export const protect = asyncHandler(async (req, res, next) => {
@@ -191,16 +193,23 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 export const changePassword = asyncHandler(async (req, res, next) => {
-  const { currentPassword, newPassword } = req.body;
+  const { currentPassword, newPassword, newConfirmPassword } = req.body;
 
   // Validate input fields
-  if (!currentPassword || !newPassword) {
+
+  if (newPassword !== newConfirmPassword) {
+    return next(
+      new AppError("New Password Must Equal new Confirm Password", 400)
+    );
+  }
+
+  if (!currentPassword || !newPassword || !newConfirmPassword) {
     return next(
       new AppError("Please provide both current and new passwords", 400)
     );
   }
 
-  const user = await userModel.findById(req.user.id);
+  const user = await userModel.findById(req.user._id);
 
   if (!(await bcrypt.compare(currentPassword, user.password))) {
     return next(new AppError("Your current password is wrong", 400));

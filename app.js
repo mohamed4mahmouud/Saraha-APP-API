@@ -12,6 +12,8 @@ app.use(express.json());
 
 dbConnection();
 
+app.use("/api/v1/uploads", express.static("./uploads"));
+
 app.use("/api/v1/user", allRoutes.userRouter);
 app.use("/api/v1/messages", allRoutes.messageRouter);
 

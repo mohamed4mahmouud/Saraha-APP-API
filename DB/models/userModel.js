@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     birthDate: Date,
     active: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     passwordChangedAt: Date,
     passwordResetCode: String,

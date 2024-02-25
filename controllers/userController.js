@@ -52,3 +52,15 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
   }
   res.status(204).json({ message: "user deleted" });
 });
+
+export const profilePhoto = async (req, res) => {
+  if (req.file) {
+    await userModel.updateOne(
+      { _id: req.user._id },
+      {
+        profilePic: req.file.path,
+      }
+    );
+    res.json({ message: "done" });
+  }
+};
